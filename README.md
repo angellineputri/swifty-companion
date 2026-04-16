@@ -10,9 +10,10 @@ A Flutter mobile app that lets you search for 42 Network students and view their
 
 ## Setup
 1. Clone this repo
-2. Create a `.env` file in the root with:
+2. Create a `.env` file (*example on the .env-example file*) in the root with:
 - UID=your_client_id
 - SECRET=your_client_secret
+
 3. Run `flutter pub get`
 4. Run `flutter run`
 
