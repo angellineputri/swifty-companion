@@ -20,6 +20,9 @@ class AppColors {
   static const Color pastelPurple = Color(0xFFC8AEE8);
   static const Color pastelGreen = Color(0xFFA8D8B0);
 
+  // error
+  static const Color error   = Color(0xFFE05252);
+
   // coalition colors
   static const Color arrakisBg = Color(0xFF2A0808);
   static const Color arrakisAccent = Color(0xFFFF6B6B);

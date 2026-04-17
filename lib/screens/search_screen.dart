@@ -56,7 +56,14 @@ class _SearchScreenState extends State<SearchScreen> {
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User "$login" not found.')),
+        SnackBar(
+          content: Text('User "$login" not found.'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       );
     }
   }

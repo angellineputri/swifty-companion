@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -58,7 +60,7 @@ class ApiService {
       final userResponse = await http.get(
         Uri.parse('$_baseUrl/users/$login'),
         headers: {'Authorization': 'Bearer $_accessToken'},
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (userResponse.statusCode == 404) return null;
       if (userResponse.statusCode != 200) {
@@ -114,6 +116,12 @@ class ApiService {
         }
       }
       return user;
+    } on SocketException {
+      debugPrint('No internet connection');
+      return null;
+    } on TimeoutException {
+      debugPrint('Request timed out');
+      return null;
     } catch (e) {
       debugPrint('Get user error: $e');
       return null;
