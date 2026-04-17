@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
+import 'profile_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -37,7 +38,27 @@ class _SearchScreenState extends State<SearchScreen> {
       );
       return;
     }
-    debugPrint('Searching for: $login');
+
+    setState(() => _isLoading = true);
+
+    final user = await _apiService.getUser(login);
+
+    setState(() => _isLoading = false);
+
+    if (!mounted) return;
+
+    if (user != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ProfileScreen(user: user),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('User "$login" not found.')),
+      );
+    }
   }
 
   @override
