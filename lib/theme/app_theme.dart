@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // backgrounds
-  static const Color background = Color(0xFF010101);
+  static const Color background = Color(0xFF1e1e25);
   static const Color surface = Color(0xFF1A1A1A);
   static const Color surfaceLight = Color(0xFF2A2A2A);
 
@@ -24,14 +24,17 @@ class AppColors {
   static const Color error   = Color(0xFFE05252);
 
   // coalition colors
-  static const Color arrakisBg = Color(0xFF2A0808);
-  static const Color arrakisAccent = Color(0xFFFF6B6B);
+  static const Color arrakisBg = Color(0xFFCC8A8A);
+  static const Color arrakisAccent = Color(0xFFCC8A8A);
+  static const Color arrakisIcon = Color(0xFF1e1e25);
 
-  static const Color coruscantBg = Color(0xFF08112A);
-  static const Color coruscantAccent = Color(0xFF6A9FFF);
+  static const Color coruscantBg = Color(0xFF8AAAC8);
+  static const Color coruscantAccent = Color(0xFF8AAAC8);
+  static const Color coruscantIcon = Color(0xFF1e1e25);
 
-  static const Color asgardBg = Color(0xFF2A1E08);
-  static const Color asgardAccent = Color(0xFFFDC648);
+  static const Color asgardBg = Color(0xFFC8B87A);
+  static const Color asgardAccent = Color(0xFFC8B87A);
+  static const Color asgardIcon = Color(0xFF1e1e25);
 }
 
 class AppTheme {
