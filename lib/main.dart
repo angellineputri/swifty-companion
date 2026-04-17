@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import 'theme/app_theme.dart';
 import 'screens/search_screen.dart';
 
 void main() async {
@@ -17,10 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Swifty Companion',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.darkPink,
       home: const SearchScreen(),
     );
   }
