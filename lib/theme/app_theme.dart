@@ -19,6 +19,16 @@ class AppColors {
   static const Color pastelBlue = Color(0xFFAAC4E8);
   static const Color pastelPurple = Color(0xFFC8AEE8);
   static const Color pastelGreen = Color(0xFFA8D8B0);
+
+  // coalition colors
+  static const Color arrakisBg = Color(0xFF2A0808);
+  static const Color arrakisAccent = Color(0xFFFF6B6B);
+
+  static const Color coruscantBg = Color(0xFF08112A);
+  static const Color coruscantAccent = Color(0xFF6A9FFF);
+
+  static const Color asgardBg = Color(0xFF2A1E08);
+  static const Color asgardAccent = Color(0xFFFDC648);
 }
 
 class AppTheme {

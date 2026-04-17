@@ -163,6 +163,7 @@ class _SearchScreenState extends State<SearchScreen> {
         TextField(
           controller: _searchController,
           style: const TextStyle(color: AppColors.textPrimary),
+          enabled: !_isLoading,
           decoration: const InputDecoration(
             hintText: 'Enter a 42 login...',
           ),
@@ -177,8 +178,17 @@ class _SearchScreenState extends State<SearchScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: _search,
-            child: const Text('Search'),
+            onPressed: _isLoading ? null : _search,
+            child: _isLoading
+                ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: AppColors.pinkText,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Text('Search'),
           ),
         ),
       ],

@@ -54,23 +54,66 @@ class ApiService {
     }
 
     try {
-      final response = await http.get(
+      // fetch user data
+      final userResponse = await http.get(
         Uri.parse('$_baseUrl/users/$login'),
-        headers: {
-          'Authorization': 'Bearer $_accessToken',
-        },
+        headers: {'Authorization': 'Bearer $_accessToken'},
       );
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        return User.fromJson(json);
-      } else if (response.statusCode == 404) {
-        debugPrint('User not found: $login');
-        return null;
-      } else {
-        debugPrint('Error: ${response.statusCode}');
+      if (userResponse.statusCode == 404) return null;
+      if (userResponse.statusCode != 200) {
+        debugPrint('Error: ${userResponse.statusCode}');
         return null;
       }
+
+      final userJson = jsonDecode(userResponse.body);
+      User user = User.fromJson(userJson);
+
+      final coalitionResponse = await http.get(
+        Uri.parse('$_baseUrl/users/$login/coalitions?cursus_id=21'),
+        headers: {'Authorization': 'Bearer $_accessToken'},
+      );
+
+      final coalitionUserResponse = await http.get(
+        Uri.parse('$_baseUrl/coalitions_users?filter[user_id]=${userJson['id']}'),
+        headers: {'Authorization': 'Bearer $_accessToken'},
+      );
+
+      if (coalitionResponse.statusCode == 200) {
+        final coalitionJson = jsonDecode(coalitionResponse.body) as List;
+        if (coalitionJson.isNotEmpty) {
+          final coalitionData = coalitionJson.first;
+
+          // get personal score and rank from coalitions_users
+          int personalScore = 0;
+          String personalRank = '-';
+          if (coalitionUserResponse.statusCode == 200) {
+            final coalitionUserJson =
+                jsonDecode(coalitionUserResponse.body) as List;
+            if (coalitionUserJson.isNotEmpty) {
+              personalScore = coalitionUserJson.first['score'] ?? 0;
+              personalRank = '${coalitionUserJson.first['rank']}';
+            }
+          }
+
+          user = User(
+            login: user.login,
+            email: user.email,
+            displayName: user.displayName,
+            imageUrl: user.imageUrl,
+            location: user.location,
+            wallet: user.wallet,
+            correctionPoints: user.correctionPoints,
+            score: personalScore,
+            rank: personalRank,
+            level: user.level,
+            skills: user.skills,
+            projects: user.projects,
+            coalition: Coalition.fromJson(coalitionData),
+          );
+        }
+      }
+      return user;
     } catch (e) {
       debugPrint('Get user error: $e');
       return null;
