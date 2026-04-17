@@ -156,15 +156,27 @@ class _SearchScreenState extends State<SearchScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
-        const Center(
-          child: Text(
-            'Search',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SizedBox(width: 40),
+            const Text(
+              'Search',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
+            IconButton(
+              icon: const Icon(Icons.logout, color: AppColors.textHint, size: 20),
+              onPressed: () {
+                setState(() => _isLoggedIn = false);
+                _apiService.logout();
+              },
+              padding: EdgeInsets.zero,
+            ),
+          ],
         ),
         const SizedBox(height: 32),
         TextField(

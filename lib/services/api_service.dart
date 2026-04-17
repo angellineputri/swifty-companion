@@ -19,6 +19,8 @@ class ApiService {
   static const String _baseUrl = 'https://api.intra.42.fr/v2';
 
   String? _accessToken;
+  String? _refreshToken;
+  DateTime? _tokenExpiry;
 
   Future<bool> login() async {
     try {
@@ -40,11 +42,61 @@ class ApiService {
 
       if (result != null) {
         _accessToken = result.accessToken;
+        _refreshToken = result.refreshToken;
+        _tokenExpiry = result.accessTokenExpirationDateTime;
         return true;
       }
       return false;
     } catch (e) {
       debugPrint('Login error: $e');
+      return false;
+    }
+  }
+
+  void logout() {
+    _accessToken = null;
+    _refreshToken = null;
+    _tokenExpiry = null;
+  }
+
+  Future<bool> _refreshIfNeeded() async {
+    if (_accessToken != null &&
+        _tokenExpiry != null &&
+      DateTime.now().isBefore(
+        _tokenExpiry!.subtract(const Duration(hours: 3)),
+      )) {
+      return true;
+    }
+
+    if (_refreshToken == null) return false;
+
+    try {
+      final clientId = dotenv.env['UID'] ?? '';
+      final clientSecret = dotenv.env['SECRET'] ?? '';
+
+      final result = await _appAuth.token(
+        TokenRequest(
+          clientId,
+          _redirectUrl,
+          clientSecret: clientSecret,
+          refreshToken: _refreshToken,
+          serviceConfiguration: const AuthorizationServiceConfiguration(
+            authorizationEndpoint: _authorizationEndpoint,
+            tokenEndpoint: _tokenEndpoint,
+          ),
+          scopes: ['public'],
+        ),
+      );
+
+      if (result != null) {
+        _accessToken = result.accessToken;
+        _refreshToken = result.refreshToken ?? _refreshToken;
+        _tokenExpiry = result.accessTokenExpirationDateTime;
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Token refresh error: $e');
       return false;
     }
   }
@@ -55,8 +107,13 @@ class ApiService {
       return null;
     }
 
+    final tokenValid = await _refreshIfNeeded();
+    if (!tokenValid) {
+      debugPrint('Token expired and could not refresh');
+      return null;
+    }
+
     try {
-      // fetch user data
       final userResponse = await http.get(
         Uri.parse('$_baseUrl/users/$login'),
         headers: {'Authorization': 'Bearer $_accessToken'},
@@ -74,19 +131,18 @@ class ApiService {
       final coalitionResponse = await http.get(
         Uri.parse('$_baseUrl/users/$login/coalitions?cursus_id=21'),
         headers: {'Authorization': 'Bearer $_accessToken'},
-      );
+      ).timeout(const Duration(seconds: 10));
 
       final coalitionUserResponse = await http.get(
         Uri.parse('$_baseUrl/coalitions_users?filter[user_id]=${userJson['id']}'),
         headers: {'Authorization': 'Bearer $_accessToken'},
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (coalitionResponse.statusCode == 200) {
         final coalitionJson = jsonDecode(coalitionResponse.body) as List;
         if (coalitionJson.isNotEmpty) {
           final coalitionData = coalitionJson.first;
 
-          // get personal score and rank from coalitions_users
           int personalScore = 0;
           String personalRank = '-';
           if (coalitionUserResponse.statusCode == 200) {
