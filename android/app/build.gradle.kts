@@ -28,6 +28,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Required by flutter_appauth for the OAuth2 redirect back into the app.
+        // Must match the scheme of _redirectUrl in ApiService.
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.swiftycompanion"
     }
 
     buildTypes {

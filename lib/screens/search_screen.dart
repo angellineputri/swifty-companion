@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/user_model.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
 import 'profile_screen.dart';
@@ -41,7 +42,16 @@ class _SearchScreenState extends State<SearchScreen> {
 
     setState(() => _isLoading = true);
 
-    final user = await _apiService.getUser(login);
+    User? user;
+    String? errorMessage;
+    try {
+      user = await _apiService.getUser(login);
+      // A null result means the request succeeded but the login doesn't exist.
+      if (user == null) errorMessage = 'User "$login" not found.';
+    } on ApiException catch (e) {
+      // Network, timeout, session or server error — distinct from not-found.
+      errorMessage = e.message;
+    }
 
     setState(() => _isLoading = false);
 
@@ -51,13 +61,13 @@ class _SearchScreenState extends State<SearchScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ProfileScreen(user: user),
+          builder: (context) => ProfileScreen(user: user!),
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('User "$login" not found.'),
+          content: Text(errorMessage!),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -190,7 +200,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         const SizedBox(height: 4),
         const Text(
-          'e.g. aputri-a, dfasius',
+          'e.g. aputri-a',
           style: TextStyle(color: AppColors.textHint, fontSize: 12),
         ),
         const SizedBox(height: 16),

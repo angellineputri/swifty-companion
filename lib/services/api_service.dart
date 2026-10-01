@@ -7,6 +7,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
 
+/// Thrown when a request fails for a reason other than the login not existing
+/// (no connection, timeout, expired session, server error). Lets the UI tell
+/// a network/auth problem apart from a genuine "user not found".
+class ApiException implements Exception {
+  final String message;
+  const ApiException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 class ApiService {
   final FlutterAppAuth _appAuth = const FlutterAppAuth();
 
@@ -103,14 +114,12 @@ class ApiService {
 
   Future<User?> getUser(String login) async {
     if (_accessToken == null) {
-      debugPrint('No access token');
-      return null;
+      throw const ApiException('Not logged in. Please log in again.');
     }
 
     final tokenValid = await _refreshIfNeeded();
     if (!tokenValid) {
-      debugPrint('Token expired and could not refresh');
-      return null;
+      throw const ApiException('Session expired. Please log in again.');
     }
 
     try {
@@ -119,10 +128,11 @@ class ApiService {
         headers: {'Authorization': 'Bearer $_accessToken'},
       ).timeout(const Duration(seconds: 10));
 
+      // Only a 404 means the login genuinely does not exist.
       if (userResponse.statusCode == 404) return null;
       if (userResponse.statusCode != 200) {
         debugPrint('Error: ${userResponse.statusCode}');
-        return null;
+        throw ApiException('Server error (${userResponse.statusCode}). Try again.');
       }
 
       final userJson = jsonDecode(userResponse.body);
@@ -174,13 +184,15 @@ class ApiService {
       return user;
     } on SocketException {
       debugPrint('No internet connection');
-      return null;
+      throw const ApiException('No internet connection. Check your network.');
     } on TimeoutException {
       debugPrint('Request timed out');
-      return null;
+      throw const ApiException('Request timed out. Please try again.');
+    } on ApiException {
+      rethrow;
     } catch (e) {
       debugPrint('Get user error: $e');
-      return null;
+      throw const ApiException('Something went wrong. Please try again.');
     }
   }
 
