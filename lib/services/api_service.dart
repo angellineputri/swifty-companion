@@ -74,7 +74,7 @@ class ApiService {
     if (_accessToken != null &&
         _tokenExpiry != null &&
       DateTime.now().isBefore(
-        _tokenExpiry!.subtract(const Duration(hours: 3)),
+        _tokenExpiry!.subtract(const Duration(minutes: 1)),
       )) {
       return true;
     }
@@ -121,6 +121,8 @@ class ApiService {
     if (!tokenValid) {
       throw const ApiException('Session expired. Please log in again.');
     }
+
+    login = Uri.encodeComponent(login.toLowerCase());
 
     try {
       final userResponse = await http.get(

@@ -84,7 +84,9 @@ class _SearchScreenState extends State<SearchScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
-          child: _isLoggedIn ? _buildSearchView() : _buildLoginView(),
+          child: _isLoggedIn
+              ? SingleChildScrollView(child: _buildSearchView())
+              : _buildLoginView(),
         ),
       ),
     );

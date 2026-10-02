@@ -481,9 +481,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProjects(Color color) {
-    final allProjects = widget.user.projects
+    var allProjects = widget.user.projects
         .where((p) => p.cursusIds.contains(21) && p.status != 'parent')
         .toList();
+
+    if (allProjects.isEmpty) {
+      allProjects = widget.user.projects
+          .where((p) => p.status != 'parent')
+          .toList();
+    }
 
     if (allProjects.isEmpty) return const SizedBox();
 
